@@ -25,26 +25,19 @@ export async function daftarEkskulAction(
   const nama = (formData.get("nama") as string)?.trim() || "";
   const kelas = (formData.get("kelas") as string)?.trim() || "";
 
-  // 1. Validasi per kolom (minimal 3 karakter)
   const errors: { nama?: string; kelas?: string } = {};
-  if (nama.length < 3) {
-    errors.nama = "Nama minimal 3 huruf.";
-  }
-  if (kelas.length < 3) {
-    errors.kelas = "Kelas minimal 3 karakter.";
-  }
+  if (nama.length < 3) errors.nama = "Nama minimal 3 huruf.";
+  if (kelas.length < 3) errors.kelas = "Kelas minimal 3 karakter.";
 
   if (Object.keys(errors).length > 0) {
     return { success: false, errors, values: { nama, kelas } };
   }
 
-  // 2. Periksa ekskul ada atau tidak
   const targetEkskul = ekskul.find((e) => e.id === ekskulId);
   if (!targetEkskul) {
     return { success: false, message: "ID ekskul tidak valid.", values: { nama, kelas } };
   }
 
-  // 3. Periksa apakah sudah terdaftar di ekskul ini (case-insensitive)
   const sudahAda = pendaftar.some(
     (p) =>
       p.ekskulId === ekskulId &&
@@ -59,7 +52,6 @@ export async function daftarEkskulAction(
     };
   }
 
-  // 4. Periksa kuota penuh
   const jumlahTerisi = pendaftar.filter((p) => p.ekskulId === ekskulId).length;
   if (jumlahTerisi >= targetEkskul.kuota) {
     return {
@@ -69,8 +61,6 @@ export async function daftarEkskulAction(
     };
   }
 
-  // 5. Periksa bentrok jadwal (hari dan sesi yang sama pada siswa yang sama)
-  // Mencari ekskul lain yang diikuti oleh nama & kelas ini di hari & sesi yang sama
   const ekskulDiikutiSiswa = pendaftar
     .filter((p) => p.nama.toLowerCase() === nama.toLowerCase())
     .map((p) => ekskul.find((e) => e.id === p.ekskulId))
@@ -88,15 +78,12 @@ export async function daftarEkskulAction(
     };
   }
 
-  // 6. Proses Pendaftaran Berhasil
   const nomorBaru = tambahPendaftar({ ekskulId, nama, kelas });
 
-  // Simpan nama dan kelas ke cookie agar terisi otomatis
   const cookieStore = await cookies();
   cookieStore.set("nama", nama, { path: "/", maxAge: 86400 });
   cookieStore.set("kelas", kelas, { path: "/", maxAge: 86400 });
 
-  // Revalidate halaman agar data langsung berubah tanpa F5
   revalidatePath(`/ekskul/${ekskulId}`);
   revalidatePath(`/ekskul`);
 
@@ -107,4 +94,26 @@ export async function daftarEkskulAction(
     message: `Pendaftaran #${nomorBaru} berhasil: ${targetEkskul.nama}, ${targetEkskul.hari}, sesi ${targetEkskul.sesi} (${jamSesiStr}).`,
     values: { nama, kelas },
   };
+}
+
+export async function batalkanPendaftaranAction(pendaftarId: number) {
+  const cookieStore = await cookies();
+  const namaCookie = cookieStore.get("nama")?.value?.toLowerCase() ?? "";
+  const kelasCookie = cookieStore.get("kelas")?.value?.toLowerCase() ?? "";
+
+  const index = pendaftar.findIndex((p) => p.nomor === pendaftarId);
+  if (index === -1) return;
+
+  const targetPendaftar = pendaftar[index];
+
+  if (
+    targetPendaftar.nama.toLowerCase() === namaCookie &&
+    targetPendaftar.kelas.toLowerCase() === kelasCookie
+  ) {
+    pendaftar.splice(index, 1);
+
+    revalidatePath("/saya");
+    revalidatePath(`/ekskul/${targetPendaftar.ekskulId}`);
+    revalidatePath("/ekskul");
+  }
 }

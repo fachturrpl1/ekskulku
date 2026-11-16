@@ -3,35 +3,39 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const menu = [
-    { href: "/", teks: "Beranda" },
-    { href: "/ekskul", teks: "Ekskul" },
-    { href: "/tentang", teks: "Tentang" },
-    { href: "/kontak", teks: "Kontak" },
-    { href: '/favorit', teks: "Favorit" },
-    { href: '/pendaftaran', teks: 'Pendaftaran' },
-];
-
 export default function Navbar() {
-    const pathname = usePathname();
-    return (
-        <nav className="flex items-center gap-6 border-b bg-white px-6 py-3">
-            <span className="text-lg font-bold text-red-600">
-                EkskulKu
-            </span>
-            {menu.map((m) => (
+  const pathname = usePathname();
+
+  const menu = [
+    { nama: "Beranda", href: "/" },
+    { nama: "Daftar Ekskul", href: "/ekskul" },
+    { nama: "Ekskul Saya", href: "/saya" },
+  ];
+
+  return (
+    <nav className="flex items-center gap-6 border-b bg-white px-6 py-3 shadow-sm">
+      <span className="text-lg font-bold text-red-600">EkskulKu</span>
+      
+      <div className="flex items-center gap-4 text-sm font-medium">
+        {menu.map((m) => {
+          // Bandingkan langsung dengan pathname dari Next.js
+          const isActive = pathname === m.href;
+
+          return (
             <Link
-                key={m.href}
-                href={m.href}
-                className={
-                    pathname === m.href
-                    ? "font-semibold text-red-600"
-                    : "text-slate-600 hover:text-red-600"
-                }
+              key={m.href}
+              href={m.href}
+              className={`transition-colors ${
+                isActive
+                  ? "font-semibold text-red-600"
+                  : "text-slate-600 hover:text-red-600"
+              }`}
             >
-                {m.teks}
+              {m.nama}
             </Link>
-            ))}
-        </nav>
-    );
+          );
+        })}
+      </div>
+    </nav>
+  );
 }

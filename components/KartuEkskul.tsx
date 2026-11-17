@@ -11,7 +11,7 @@ export default function KartuEkskul({ ekskul, jumlahPendaftar }: Props) {
   const isPenuh = sisa <= 0;
 
   return (
-    <div className="rounded-xl border bg-white p-4 shadow-sm flex flex-col justify-between">
+    <div className="rounded-xl border-slate-300 bg-white p-4 shadow-sm flex flex-col justify-between">
       <div>
         <div className="flex items-center justify-between mb-2">
           <span className="rounded bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-700">

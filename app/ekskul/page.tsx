@@ -1,4 +1,5 @@
 import { type Metadata } from "next";
+
 import { ambilSemuaEkskul } from "@/data/ambil";
 import { pendaftar } from "@/data/ekskul";
 import KartuEkskul from "@/components/KartuEkskul";
@@ -17,7 +18,11 @@ type PageProps = {
 };
 
 export default async function PageEkskul({ searchParams }: PageProps) {
-  const { cari, kategori, hari } = await searchParams;
+  const resolvedParams = await searchParams;
+  const cari = resolvedParams.cari ?? "";
+  const kategori = resolvedParams.kategori ?? "Semua";
+  const hari = resolvedParams.hari ?? "Semua";
+
   const semuaEkskul = await ambilSemuaEkskul();
 
   const hitungPendaftar = (id: number) => 
@@ -28,21 +33,27 @@ export default async function PageEkskul({ searchParams }: PageProps) {
     const matchCari = !cari || 
       item.nama.toLowerCase().includes(cari.toLowerCase()) || 
       item.pembina.toLowerCase().includes(cari.toLowerCase());
-    const matchKategori = !kategori || kategori === "Semua" || item.kategori === kategori;
-    const matchHari = !hari || hari === "Semua" || item.hari === hari;
+    const matchKategori = kategori === "Semua" || item.kategori === kategori;
+    const matchHari = hari === "Semua" || item.hari === hari;
     
     return matchCari && matchKategori && matchHari;
   });
+
+  // Fungsi server action / handler untuk mengubah URL saat filter diganti
+  // (Karena router.push berjalan di klien, kita buatkan fungsi pembantu atau serahkan ke KontrolKatalog via URL Router)
+  // Catatan: Karena KontrolKatalog menggunakan router.push di sisi klien, kita cukup kirim nilai string-nya saja.
 
   return (
     <main className="max-w-6xl mx-auto p-6">
       <h1 className="text-2xl font-bold mb-4 text-slate-900">Daftar Ekstrakurikuler</h1>
       
-      <KontrolKatalogEkskul />
-
-      <p className="text-sm font-medium text-slate-600 mb-4">
-        {hasilFilter.length} ekskul ditemukan.
-      </p>
+      <KontrolKatalogEkskul
+        kategori={kategori}
+        setKategori={() => {}} // Ditangani langsung oleh router.push di dalam KontrolKatalog client component
+        hari={hari}
+        setHari={() => {}} // Ditangani langsung oleh router.push di dalam KontrolKatalog client component
+        jumlahDitemukan={hasilFilter.length}
+      />
 
       {hasilFilter.length === 0 ? (
         <p className="text-slate-500 italic">Tidak ada ekskul yang cocok.</p>

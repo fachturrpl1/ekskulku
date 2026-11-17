@@ -3,7 +3,7 @@ import { type Metadata } from "next";
 import { ambilSemuaEkskul } from "@/data/ambil";
 import { pendaftar } from "@/data/ekskul";
 import KartuEkskul from "@/components/KartuEkskul";
-import KontrolKatalogEkskul from "@/components/KontrolKatalog";
+import KontrolKatalog from "@/components/KontrolKatalog";
 
 export const metadata: Metadata = {
   title: "Daftar Ekskul · EkskulKu",
@@ -44,7 +44,7 @@ export default async function PageEkskul({ searchParams }: PageProps) {
       <h1 className="text-2xl font-bold mb-4 text-slate-900">Daftar Ekstrakurikuler</h1>
       
       <Suspense fallback={<p className="text-slate-400">Memuat kontrol filter...</p>}>
-        <KontrolKatalogEkskul
+        <KontrolKatalog
           kategori={kategori}
           hari={hari}
           jumlahDitemukan={hasilFilter.length}

@@ -18,34 +18,31 @@ export default function KontrolKatalog({
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const handleKategoriChange = (val: string) => {
+  const ubahParam = (nama: "kategori" | "hari", val: string) => {
     const params = new URLSearchParams(searchParams.toString());
     if (val === "Semua") {
-      params.delete("kategori");
+      params.delete(nama);
     } else {
-      params.set("kategori", val);
+      params.set(nama, val);
     }
-    router.push(`/ekskul?${params.toString()}`);
-  };
-
-  const handleHariChange = (val: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (val === "Semua") {
-      params.delete("hari");
-    } else {
-      params.set("hari", val);
-    }
-    router.push(`/ekskul?${params.toString()}`);
+    const query = params.toString();
+    router.push(query ? `/ekskul?${query}` : "/ekskul");
   };
 
   return (
-    <div className="mb-6 flex flex-wrap gap-4 rounded-xl border bg-white p-4 shadow-sm items-center">
+    <div className="mb-6 flex flex-wrap items-center gap-4 rounded-xl border bg-white p-4 shadow-sm">
       {/* Saringan Kategori */}
       <div className="flex flex-col gap-1">
-        <label className="text-xs font-medium text-slate-500">Kategori</label>
+        <label
+          htmlFor="filter-kategori"
+          className="text-xs font-medium text-slate-500"
+        >
+          Kategori
+        </label>
         <select
+          id="filter-kategori"
           value={kategori}
-          onChange={(e) => handleKategoriChange(e.target.value)}
+          onChange={(e) => ubahParam("kategori", e.target.value)}
           className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-red-500 focus:outline-none"
         >
           <option value="Semua">Semua kategori</option>
@@ -59,10 +56,16 @@ export default function KontrolKatalog({
 
       {/* Saringan Hari */}
       <div className="flex flex-col gap-1">
-        <label className="text-xs font-medium text-slate-500">Hari</label>
+        <label
+          htmlFor="filter-hari"
+          className="text-xs font-medium text-slate-500"
+        >
+          Hari
+        </label>
         <select
+          id="filter-hari"
           value={hari}
-          onChange={(e) => handleHariChange(e.target.value)}
+          onChange={(e) => ubahParam("hari", e.target.value)}
           className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-red-500 focus:outline-none"
         >
           <option value="Semua">Semua hari</option>
@@ -74,7 +77,7 @@ export default function KontrolKatalog({
         </select>
       </div>
 
-      <div className="w-full pt-2 border-t text-sm text-slate-600 font-medium">
+      <div className="w-full border-t pt-2 text-sm font-medium text-slate-600">
         {jumlahDitemukan} ekskul ditemukan.
       </div>
     </div>

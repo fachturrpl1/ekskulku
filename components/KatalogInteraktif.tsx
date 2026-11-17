@@ -1,12 +1,12 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { type Ekskul, pendaftar } from "@/data/ekskul";
 import KartuEkskul from "./KartuEkskul";
 import KontrolKatalogEkskul from "./KontrolKatalog";
 
 export default function KatalogInteraktifEkskul({ ekskul }: { ekskul: Ekskul[] }) {
-  const router = useRouter();
+  // const router = useRouter();
   const searchParams = useSearchParams();
 
   // Ambil nilai langsung dari URL searchParams (tidak perlu useState & useEffect)
@@ -14,26 +14,26 @@ export default function KatalogInteraktifEkskul({ ekskul }: { ekskul: Ekskul[] }
   const hari = searchParams.get("hari") || "Semua";
 
   // Handler ubah kategori & update URL
-  const handleKategoriChange = (val: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (val === "Semua") {
-      params.delete("kategori");
-    } else {
-      params.set("kategori", val);
-    }
-    router.push(`/ekskul?${params.toString()}`);
-  };
+  // const handleKategoriChange = (val: string) => {
+  //   const params = new URLSearchParams(searchParams.toString());
+  //   if (val === "Semua") {
+  //     params.delete("kategori");
+  //   } else {
+  //     params.set("kategori", val);
+  //   }
+  //   router.push(`/ekskul?${params.toString()}`);
+  // };
 
-  // Handler ubah hari & update URL
-  const handleHariChange = (val: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (val === "Semua") {
-      params.delete("hari");
-    } else {
-      params.set("hari", val);
-    }
-    router.push(`/ekskul?${params.toString()}`);
-  };
+  // // Handler ubah hari & update URL
+  // const handleHariChange = (val: string) => {
+  //   const params = new URLSearchParams(searchParams.toString());
+  //   if (val === "Semua") {
+  //     params.delete("hari");
+  //   } else {
+  //     params.set("hari", val);
+  //   }
+  //   router.push(`/ekskul?${params.toString()}`);
+  // };
 
   const hitungPendaftar = (id: number) =>
     pendaftar.filter((p) => p.ekskulId === id).length;
@@ -49,9 +49,7 @@ export default function KatalogInteraktifEkskul({ ekskul }: { ekskul: Ekskul[] }
     <div>
       <KontrolKatalogEkskul
         kategori={kategori}
-        setKategori={handleKategoriChange}
         hari={hari}
-        setHari={handleHariChange}
         jumlahDitemukan={hasil.length}
       />
 
